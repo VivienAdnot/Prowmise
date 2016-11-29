@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "es5",
+        "sourceMap": true,
+        "removeComments": true,
+        "allowSyntheticDefaultImports": false,
+        "forceConsistentCasingInFileNames": true,
+        "noImplicitAny": true
+        //"noUnusedLocals": true
+        //"strictNullChecks": true
+    },
+    "include": [
+        "src/**/*"
+    ]
+}
