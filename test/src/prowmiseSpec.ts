@@ -1,25 +1,23 @@
-import { Prowmise } from '../../src/prowmise'
-import { State } from '../../src/prowmise'
+// import { Prowmise } from '../../src/prowmise'
+// import { State } from '../../src/prowmise'
 
-export function prowmiseSpec() {
-    describe("Prowmise", () => {
-        let instance:Prowmise;
+// export function prowmiseSpec() {
+//     describe("Prowmise", () => {
+//         let instance:Prowmise;
 
-        beforeEach(function() {
-            instance = new Prowmise(function(resolve, reject) {
+//         beforeEach(function() {
+//             instance = new Prowmise((resolve, reject) => window.setTimeout(resolve(100), 200));            
+//         })
 
-            });
-        })
+//         it("should accept new", () => {
+//             expect(instance).toBeDefined;
+//         })
 
-        it("should accept new", () => {
-            expect(instance).toBeDefined;
-        })
-
-        it("should trigger callback onFulfill", (done:Function) => {
-            instance.done({
-                onFulfilled: done,
-                onRejected: () => {}
-            });            
-        })
-    });
-}
+//         it("should trigger callback onFulfill", (done:Function) => {
+//             instance.done(
+//                 done, // onFulfilled
+//                 () => {} // onRejected
+//             );            
+//         })
+//     });
+// }

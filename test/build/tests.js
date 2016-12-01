@@ -54,22 +54,18 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var prowmiseTest_1 = __webpack_require__(2);
+	var prowmise_1 = __webpack_require__(2);
 	function prowmiseSpec() {
 	    describe("Prowmise", function () {
 	        var instance;
 	        beforeEach(function () {
-	            instance = new prowmiseTest_1.Prowmise(function (resolve, reject) {
-	            });
+	            instance = new prowmise_1.Prowmise(function (resolve, reject) { return window.setTimeout(resolve(100), 200); });
 	        });
 	        it("should accept new", function () {
 	            expect(instance).toBeDefined;
 	        });
 	        it("should trigger callback onFulfill", function (done) {
-	            instance.done({
-	                onFulfilled: done,
-	                onRejected: function () { }
-	            });
+	            instance.done(done, function () { });
 	        });
 	    });
 	}
@@ -87,10 +83,18 @@
 	        this._state = 0;
 	        this._value = null;
 	        this._handlers = new Array();
-	        this.doResolve(action, this.resolve, this.reject);
+	        try {
+	            action(this.fulfill, this.reject);
+	        }
+	        catch (e) {
+	            this.reject(e);
+	        }
 	    }
-	    Prowmise.prototype.done = function (handlers) {
-	        this.handle(handlers);
+	    Prowmise.prototype.done = function (onFulfilled, onRejected) {
+	        this.handle({
+	            onFulfilled: onFulfilled,
+	            onRejected: onRejected
+	        });
 	    };
 	    Prowmise.prototype.fulfill = function (result) {
 	        this._state = 1;
@@ -104,66 +108,16 @@
 	        this._handlers.forEach(this.handle);
 	        this._handlers = null;
 	    };
-	    Prowmise.prototype.resolve = function (result) {
-	        try {
-	            var then = this.getThen(result);
-	            if (then) {
-	                this.doResolve(then.bind(result), this.resolve, this.reject);
-	                return;
-	            }
-	            this.fulfill(result);
-	        }
-	        catch (e) {
-	            this.reject(e);
-	        }
-	    };
-	    Prowmise.prototype.getThen = function (value) {
-	        var t = typeof value;
-	        if (value && (t === "object" || t === "function")) {
-	            var then = value.then;
-	            if (typeof then === "function") {
-	                return then;
-	            }
-	        }
-	        return null;
-	    };
-	    Prowmise.prototype.doResolve = function (action, onFulfilled, onRejected) {
-	        var done = false;
-	        var callbackOnFulfilled = function (value) {
-	            if (done) {
-	                return;
-	            }
-	            done = true;
-	            onFulfilled(value);
-	        };
-	        var callbackOnRejected = function (reason) {
-	            if (done) {
-	                return;
-	            }
-	            done = true;
-	            onRejected(reason);
-	        };
-	        try {
-	            action(callbackOnFulfilled, callbackOnRejected);
-	        }
-	        catch (ex) {
-	            if (done) {
-	                return;
-	            }
-	            done = true;
-	            onRejected(ex);
-	        }
-	    };
-	    Prowmise.prototype.handle = function (handler) {
+	    Prowmise.prototype.handle = function (handlers) {
 	        switch (this._state) {
 	            case 0:
-	                this._handlers.push(handler);
+	                this._handlers.push(handlers);
 	                break;
 	            case 1:
-	                handler.onFulfilled(this._value);
+	                handlers.onFulfilled(this._value);
 	                break;
 	            case 2:
-	                handler.onRejected(this._value);
+	                handlers.onRejected(this._value);
 	                break;
 	        }
 	    };

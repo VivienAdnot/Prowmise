@@ -7,10 +7,10 @@
         "**/.hg": true,
         "**/.DS_Store": true,
         /* Project excludes */
-        "build/**/*": true,
+        //"build/**/*": true,
         "test/build/**/*": true,
-        "dist/**/*": true
-        //"node_modules/**/*": true
+        //"dist/**/*": true,
+        "node_modules/**/*": true
     },
     
     "typescript.tsdk": "./node_modules/typescript/lib"
