@@ -59,10 +59,7 @@
 	    describe("Prowmise", function () {
 	        var instance;
 	        beforeEach(function () {
-	            instance = new prowmise_1.Prowmise(function (resolve, reject) { return window.setTimeout(resolve(100), 200); });
-	        });
-	        it("should accept new", function () {
-	            expect(instance).toBeDefined;
+	            instance = new prowmise_1.Prowmise(function (resolve, reject) { return resolve(100); });
 	        });
 	        it("should trigger callback onFulfill", function (done) {
 	            instance.done(done, function () { });
@@ -79,33 +76,39 @@
 	"use strict";
 	;
 	var Prowmise = (function () {
-	    function Prowmise(action) {
+	    function Prowmise(executor) {
+	        this._executor = executor;
 	        this._state = 0;
 	        this._value = null;
 	        this._handlers = new Array();
+	        this.initialize();
+	    }
+	    Prowmise.prototype.initialize = function () {
 	        try {
-	            action(this.fulfill, this.reject);
+	            this._executor(this.fulfill.bind(this), this.reject.bind(this));
 	        }
 	        catch (e) {
 	            this.reject(e);
 	        }
-	    }
+	    };
 	    Prowmise.prototype.done = function (onFulfilled, onRejected) {
 	        this.handle({
-	            onFulfilled: onFulfilled,
-	            onRejected: onRejected
+	            onFulfilled: onFulfilled.bind(this),
+	            onRejected: onRejected.bind(this)
 	        });
 	    };
 	    Prowmise.prototype.fulfill = function (result) {
+	        var _this = this;
 	        this._state = 1;
 	        this._value = result;
-	        this._handlers.forEach(this.handle);
+	        this._handlers.forEach(function (value) { return _this.handle(value); });
 	        this._handlers = null;
 	    };
 	    Prowmise.prototype.reject = function (error) {
+	        var _this = this;
 	        this._state = 2;
 	        this._value = error;
-	        this._handlers.forEach(this.handle);
+	        this._handlers.forEach(function (value) { return _this.handle(value); });
 	        this._handlers = null;
 	    };
 	    Prowmise.prototype.handle = function (handlers) {
