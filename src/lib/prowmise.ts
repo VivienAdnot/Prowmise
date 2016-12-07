@@ -11,6 +11,14 @@ interface IHandlers {
     onRejected: Function
 }
 
+interface Thenable {
+    then(): any;
+}
+
+function isThenable(value: any): value is Thenable {
+    return (<Thenable>value).then !== undefined;
+}
+
 export class Prowmise {
     private _state: State;
     private _value: any;
@@ -26,20 +34,27 @@ export class Prowmise {
         this.initialize();
     }
 
-    private initialize() {
-        try {
-            this._executor(this.fulfill.bind(this), this.reject.bind(this));
-        } catch(e) {
-            this.reject(e);
-        }
-    }
-
     public done(onFulfilled: Function, onRejected: Function): void {
         this.handle({
             onFulfilled: onFulfilled.bind(this),
             onRejected: onRejected.bind(this)
         });
     }
+
+    public then(onFulfilled: Function, onRejected: Function): Prowmise {
+        return new Prowmise((resolve : Function, reject : Function) => this.done(
+            (result:any) => resolve(onFulfilled(result)),
+            (error:string) => resolve(onRejected(error))
+        ));
+    }
+
+    private initialize() {
+        try {
+            this._executor(this.fulfill.bind(this), this.reject.bind(this));
+        } catch(e) {
+            this.reject(e);
+        }
+    }    
 
     private fulfill(result: any): void {
         this._state = State.Fulfilled;
