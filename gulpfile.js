@@ -14,11 +14,7 @@ const paths = {
 const webpackBaseConfig = {
     debug: true,
     bail: true,
-    output: {
-        //library: "Playtem",
-        //libraryTarget: "umd",
-        //umdNamedDefine: true
-    },
+    output: {},
     devtool: "source-map",
     resolve: {
         extensions: [ '', '.ts']
@@ -82,6 +78,12 @@ function buildWebpackTest(sourceFilename, outputFilename) {
         }));   
 }
 
+gulp.task('build', ['build:main']);
+
+gulp.task('build:main', function() {
+    return buildWebpack('./src/main.ts', 'bundle.js');
+});
+
 gulp.task('test', function() {
     return buildWebpackTest('./test/main.ts', 'tests.js');
 });
@@ -92,10 +94,3 @@ gulp.task('dev', function() {
         port: 9999
     });
 });
-
-gulp.task('build', ['build:main']);
-
-gulp.task('build:main', function() {
-    return buildWebpack('./src/main.ts', 'bundle.js');
-});
-

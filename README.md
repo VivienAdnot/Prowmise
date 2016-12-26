@@ -1,3 +1,3 @@
 npm install
-gulp
+gulp build
 gulp dev
